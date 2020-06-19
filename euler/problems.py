@@ -17,10 +17,10 @@ class Problems:
 
     def run(self):
         for _,method in self.problem_methods.items():
-            print("="*40)
+            print(f"\t{'='*40}")
             print(method.__doc__)
             print(f"\tResult: {method()}")
-            print("="*40)
+            print(f"\t{'='*40}")
             print()
 
     @register_problem
