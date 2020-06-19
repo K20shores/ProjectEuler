@@ -2,5 +2,5 @@
 from euler import problems
 
 if __name__ == '__main__':
-    runner = problems.Problems()
+    runner = problems.Problems(only_current=True)
     runner.run()
