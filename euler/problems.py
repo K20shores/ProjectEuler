@@ -10,7 +10,8 @@ def register_problem(f):
 def current(f):
     """
     Creates an attribute on the method, so it can
-    be identied as a function to call
+    be identied as the only function to call, 
+    assuming this decorator is only used once
     """
     f._is_current = True
     return f
@@ -44,7 +45,15 @@ class Problems:
         Find the sum of all the multiples of 3 or 5 below 1000.
         """
 
-        return sum([i for i in range(1000) if i % 3 == 0 or i % 5 == 0])
+        # 999 because we are only going up to 1000, not including
+        N = 999 // 3
+        Q = 999 // 5
+        R = 999 // 15
+        _3sum = (N * (N + 1)) / 2
+        _5sum = (Q * (Q + 1)) / 2
+        _15sum = (R * (R + 1)) / 2
+        return int(3 * _3sum + 5 * _5sum - 15 * _15sum) 
+        #return sum([i for i in range(1000) if i % 3 == 0 or i % 5 == 0])
     
     @current
     @register_problem
@@ -58,4 +67,21 @@ class Problems:
         By considering the terms in the Fibonacci sequence whose values do not exceed four million,
         find the sum of the even-valued terms.
         """
-        return 0
+        # tuple unpacking
+        # a tuple is an object in parentheses, like (1,2)
+        # any two variables separated by a comma are implictly converted
+        # to a tuple
+        # you can unpack (assign values to variables), by giving a variable
+        # for each item in the tuple
+        a, b = 1, 2
+        acc = 0
+
+        # e is scientific notation here, 4 * 10 ^ 6
+        # oh, to raise a number to a power in python, use 2 stars
+        # the mathematical expresion 2^2 is written, in python, like 2 ** 2
+        # the ^ is the XOR operator, exclusive or. it is a bitwise operator
+        while b < int(4e6):
+            if b % 2 == 0:
+                acc += b
+            b, a = a+b, b
+        return acc
