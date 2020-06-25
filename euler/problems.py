@@ -1,3 +1,5 @@
+import numpy as np
+
 # https://stackoverflow.com/a/60956561/5217293
 def register_problem(f):
     """
@@ -15,6 +17,29 @@ def current(f):
     """
     f._is_current = True
     return f
+
+# utility functions
+
+def get_prime_factors(n):
+    factors = []
+
+    if n % 2 == 0:
+        while n % 2 == 0:
+            factors.append(2)
+            n /= 2
+
+    max = int(np.sqrt(n))
+    for i in range(3, max+1):
+        if n % i == 0:
+            while n % i == 0:
+                factors.append(i)
+                n /= i
+
+    if n > 2:
+        factors.append(i)
+
+    return factors
+
 
 class Problems:
     def __init__(self, only_current = False):
@@ -55,7 +80,6 @@ class Problems:
         return int(3 * _3sum + 5 * _5sum - 15 * _15sum) 
         #return sum([i for i in range(1000) if i % 3 == 0 or i % 5 == 0])
     
-    @current
     @register_problem
     def __2(self):
         """\thttps://projecteuler.net/problem=2
@@ -85,3 +109,14 @@ class Problems:
                 acc += b
             b, a = a+b, b
         return acc
+
+    @current
+    @register_problem
+    def __2(self):
+        """\thttps://projecteuler.net/problem=3
+        The prime factors of 13195 are 5, 7, 13 and 29.
+
+        What is the largest prime factor of the number 600851475143 ?
+        """
+
+        return get_prime_factors(600851475143)[-1]
