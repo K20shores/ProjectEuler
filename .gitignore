@@ -130,3 +130,5 @@ dmypy.json
 
 euler.code-workspace
 .vscode
+
+a.out

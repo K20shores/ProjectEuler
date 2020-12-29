@@ -5,6 +5,23 @@ function add_runable(f)
     problems.push(f);
 }
 
+function reverseNumber(n)
+{
+    let ns = [];
+    while (n >= 10)
+    {
+        ns.push(n % 10);
+        n = Math.floor(n / 10)
+    }
+    ns.push(n);
+    let m = 0
+    for (let i = 0; i < ns.length; ++i)
+    {
+        m += Math.round(ns[i]*Math.pow(10, (ns.length - 1) - i), 0)
+    }
+    return m;
+}
+
 // utility functions
 function get_prime_factors(n)
 {
@@ -115,4 +132,41 @@ add_runable
     }
 )
 
-problems.forEach((runnable) => console.log(`result: ${runnable()}`));
+add_runable
+(
+    function problem_4()
+    {
+        description = [
+            "https://projecteuler.net/problem=3",
+            "A palindromic number reads the same both ways.",
+            "The largest palindrome made from the product of two 2-digit numbers is 9009 = 91 × 99.",
+            "",
+            "Find the largest palindrome made from the product of two 3-digit numbers."
+        ];
+
+
+        let isPalindrome = (n) =>
+        {
+            let reversed = parseInt(`${n}`.split("").reverse().join(""));
+            return reversed === n;
+        }
+
+        let largest_palindrome = -1;
+        for (let i = 100; i <= 999; ++i)
+        {
+            for (let j = i; j <= 999; ++j)
+            {
+                if (isPalindrome(i*j) && i*j > largest_palindrome)
+                {
+                    largest_palindrome = i * j;
+                }
+            }
+        }
+
+        return largest_palindrome;
+    }
+)
+
+let f = problems[problems.length -1];
+console.log(f())
+//problems.forEach((runnable) => console.log(`result: ${runnable()}`));
