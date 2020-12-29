@@ -25,9 +25,10 @@ size_t collatz_length(uint64_t n)
 
 int main()
 {
-    std::map<uint64_t, size_t> collatz_lengths[16];
+    int n_threads = 16;
+    std::map<uint64_t, size_t> collatz_lengths[n_threads];
     int end = 1e6+1;
-    #pragma omp parallel num_threads(16)
+    #pragma omp parallel num_threads(n_threads)
     {
         #pragma omp for
         for(uint64_t i = 0; i < end; ++i)
@@ -37,7 +38,7 @@ int main()
     }
 
     std::map<uint64_t, size_t> combined;
-    for (int i = 0; i < 16; ++i)
+    for (int i = 0; i < n_threads; ++i)
     {
         combined.insert(collatz_lengths[i].begin(), collatz_lengths[i].end());
     }
