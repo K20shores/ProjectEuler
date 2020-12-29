@@ -17,39 +17,24 @@ Which starting number, under one million, produces the longest chain?
 NOTE: Once the chain starts the terms are allowed to go above one million.
 */
 #include <iostream>
-#include <unordered_map>
+#include <map>
 #include <algorithm>
 #include <omp.h>
 
-void print_unordered_map(std::unordered_map<uint64_t, size_t>& _m)
-{
-    for(auto const& pair : _m)
-    {
-        std::cout << pair.first << ": " << pair.second << "\n";
-    }
-}
-
-size_t collatz_length(uint64_t n, std::unordered_map<uint64_t, size_t>& cache)
+size_t collatz_length(uint64_t n)
 {
     size_t length = 1;
     while (n > 1)
     {
-        if (cache.find(n) == cache.end())
+        if (n % 2 == 0)
         {
-            if (n % 2 == 0)
-            {
-                n /= 2;
-            }
-            else
-            {
-                n = 3 * n + 1;
-            }
-            ++length;
+            n /= 2;
         }
         else
         {
-            return cache[n] + length;
+            n = 3 * n + 1;
         }
+        ++length;
         
     }
     return length;
@@ -57,26 +42,28 @@ size_t collatz_length(uint64_t n, std::unordered_map<uint64_t, size_t>& cache)
 
 int main()
 {
-    int n_threads = 8;
-    std::unordered_map<uint64_t, size_t> collatz_lengths[n_threads];
+    int n_threads = 16;
+    std::map<uint64_t, size_t> collatz_lengths[n_threads];
     int end = 1e6+1;
     #pragma omp parallel num_threads(n_threads)
     {
         #pragma omp for
         for(uint64_t i = 0; i < end; ++i)
         {
-            size_t length = collatz_length(i, collatz_lengths[omp_get_thread_num()]);
-            collatz_lengths[omp_get_thread_num()][i] = length;
+            collatz_lengths[omp_get_thread_num()][i] = collatz_length(i);
         }
     }
 
-    std::unordered_map<uint64_t, size_t> combined;
+    std::map<uint64_t, size_t> combined;
     for (int i = 0; i < n_threads; ++i)
     {
         combined.insert(collatz_lengths[i].begin(), collatz_lengths[i].end());
     }
 
-    // print_unordered_map(combined);
+    // for(auto const& pair : combined)
+    // {
+    //     std::cout << pair.first << ": " << pair.second << "\n";
+    // }
 
     auto max = *std::max_element(combined.begin(), combined.end(),
             [](const auto& p1, const auto& p2)
