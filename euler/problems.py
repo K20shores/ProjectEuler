@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import special
 from functools import reduce
 
 # https://stackoverflow.com/a/60956561/5217293
@@ -722,7 +723,6 @@ class Problems:
         top_ten = [str(digits[i]) for i in sorted(list(digits.keys()))[-10:]]
         return ''.join(top_ten)[::-1]
 
-    @current
     @register_problem
     def __14(self):
         """\thttps://projecteuler.net/problem=14
@@ -757,3 +757,16 @@ class Problems:
                     i = collatz(i)
                     length += 1
         return max(lengths, key=lengths.get)
+
+    @current
+    @register_problem
+    def __15(self):
+        """\thttps://projecteuler.net/problem=15
+
+        Starting in the top left corner of a 2×2 grid, and only being able to move to the right and down, there are exactly 6 routes to the bottom right corner.
+
+        How many such routes are there through a 20×20 grid?
+        """
+
+        # lattice path lengths are combinations https://en.wikipedia.org/wiki/Lattice_path
+        return int(special.binom(40, 20))
