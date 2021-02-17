@@ -884,8 +884,8 @@ class Problems:
         NOTE: As there are only 16384 routes, it is possible to solve this problem by trying every route. 
         However, Problem 67, is the same challenge with a triangle containing one-hundred rows; it cannot be solved by brute force, and requires a clever method! ;o)
         """
-        nodes = [Node(i) for i in [3, 7, 4, 2, 4, 6, 8, 5, 9, 3]]
-        # nodes = [Node(i) for i in [75, 95, 64, 17, 47, 82, 18, 35, 87, 10, 20, 4, 82, 47, 65, 19, 1, 23, 75, 3, 34, 88, 2, 77, 73, 7, 63, 67, 99, 65, 4, 28, 6, 16, 70, 92, 41, 41, 26, 56, 83, 40, 80, 70, 33, 41, 48, 72, 33, 47, 32, 37, 16, 94, 29, 53, 71, 44, 65, 25, 43, 91, 52, 97, 51, 14, 70, 11, 33, 28, 77, 73, 17, 78, 39, 68, 17, 57, 91, 71, 52, 38, 17, 14, 91, 43, 58, 50, 27, 29, 48, 63, 66, 4, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31, 4, 62, 98, 27, 23, 9, 70, 98, 73, 93, 38, 53, 60, 4, 23]]
+        # nodes = [Node(i) for i in [3, 7, 4, 2, 4, 6, 8, 5, 9, 3]]
+        nodes = [Node(i) for i in [75, 95, 64, 17, 47, 82, 18, 35, 87, 10, 20, 4, 82, 47, 65, 19, 1, 23, 75, 3, 34, 88, 2, 77, 73, 7, 63, 67, 99, 65, 4, 28, 6, 16, 70, 92, 41, 41, 26, 56, 83, 40, 80, 70, 33, 41, 48, 72, 33, 47, 32, 37, 16, 94, 29, 53, 71, 44, 65, 25, 43, 91, 52, 97, 51, 14, 70, 11, 33, 28, 77, 73, 17, 78, 39, 68, 17, 57, 91, 71, 52, 38, 17, 14, 91, 43, 58, 50, 27, 29, 48, 63, 66, 4, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31, 4, 62, 98, 27, 23, 9, 70, 98, 73, 93, 38, 53, 60, 4, 23]]
 
         for level in range(triangle_root(len(nodes))-1):
             for node in range(level+1):
@@ -902,50 +902,7 @@ class Problems:
         # index is found by subracting the triangle root from the number of nodes
         left_idx = len(nodes) - triangle_root(len(nodes))
 
-        path_values = []
-
-        # starting from the bottom row, traverse up the triangle, greedily choosing the most highly value parent as the next node
-        # for idx in range(left_idx, len(nodes)):
-        #     node = nodes[idx]
-        #     path_value = 0
-        #     while node is not None:
-        #         print(node.value)
-        #         path_value += node.value
-        #         # handle left and right tree edges
-        #         if node.upper_right is None:
-        #             node = node.upper_left
-        #         elif node.upper_left is None:
-        #             node = node.upper_right
-        #         elif node.upper_left.value > node.upper_right.value:
-        #             node = node.upper_left
-        #         else:
-        #             node = node.upper_right
-        #     print()
-        #     path_values.append(path_value)
-        
-        # print(max(path_values))
-
-        # starting from the top row, traverse down the triangle only choosing the maximum values
-        # node = nodes[0]
-        # length = 0
-        # while node is not None:
-        #     print(node.value)
-        #     length += node.value
-        #     if node.left is None and node.right is None:
-        #         node = None
-        #     else:
-        #         if node.left.value > node.right.value:
-        #             node = node.left
-        #         else:
-        #             node = node.right
-        # print(length)
-
-        # starting from the top row, set the maximum path to 0
-        # move to the next row, and set the maximum path at a node to the max value of
-        # the parent nodes plus the current nodes values
-
         for node in nodes:
-            print(node.value)
             if node.upper_left is None and node.upper_right is None:
                 # this is the rood node, set it's path value to itself
                 node.max_path_value = node.value
@@ -962,4 +919,5 @@ class Problems:
                     node.max_path_value = node.value + node.upper_left.max_path_value
                 else:
                     node.max_path_value = node.value + node.upper_right.max_path_value
+        print([nodes[i].max_path_value for i in range(left_idx, len(nodes))])
         return max([nodes[i].max_path_value for i in range(left_idx, len(nodes))])
