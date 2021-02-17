@@ -384,6 +384,7 @@ class Problems:
     
     #endregion
 
+    #region 11-20
     @register_problem
     def __11(self):
         """\thttps://projecteuler.net/problem=11
@@ -850,7 +851,6 @@ class Problems:
         
         return sum([len(name(i).replace(' ', '')) for i in range(1, 1001)])
 
-    @current
     @register_problem
     def __18(self):
         """\thttps://projecteuler.net/problem=18
@@ -892,7 +892,6 @@ class Problems:
                 parentIdx = (level * (level + 1) // 2) + node
                 leftChildIdx = parentIdx + (level + 1)
                 rightChildIdx = parentIdx + (level + 1) + 1
-                # print(f"parent {parentIdx} | left child: {parentIdx + (level + 1)} | right child: {parentIdx + (level + 1) + 1}")
                 nodes[parentIdx].add_left_child(nodes[leftChildIdx])
                 nodes[parentIdx].add_right_child(nodes[rightChildIdx])
                 nodes[leftChildIdx].add_upper_right_parent(nodes[parentIdx])
@@ -904,7 +903,7 @@ class Problems:
 
         for node in nodes:
             if node.upper_left is None and node.upper_right is None:
-                # this is the rood node, set it's path value to itself
+                # this is the root node, set it's path value to itself
                 node.max_path_value = node.value
             elif node.upper_left is None:
                 # this is on the left edge, the only option is to set the max value to this node plus the
@@ -921,3 +920,100 @@ class Problems:
                     node.max_path_value = node.value + node.upper_right.max_path_value
         print([nodes[i].max_path_value for i in range(left_idx, len(nodes))])
         return max([nodes[i].max_path_value for i in range(left_idx, len(nodes))])
+
+    @current
+    @register_problem
+    def __19(self):
+        """\thttps://projecteuler.net/problem=19
+        You are given the following information, but you may prefer to do some research for yourself.
+
+            1 Jan 1900 was a Monday.
+            Thirty days has September,
+            April, June and November.
+            All the rest have thirty-one,
+            Saving February alone,
+            Which has twenty-eight, rain or shine.
+            And on leap years, twenty-nine.
+            A leap year occurs on any year evenly divisible by 4, but not on a century unless it is divisible by 400.
+
+        How many Sundays fell on the first of the month during the twentieth century (1 Jan 1901 to 31 Dec 2000)?
+        """
+
+        return 0
+    #endregion
+
+    #region 61-70
+    @register_problem
+    def __67(self):
+        """\thttps://projecteuler.net/problem=67
+        By starting at the top of the triangle below and moving to adjacent numbers on the row below, the maximum total from top to bottom is 23.
+
+           3
+          7 4
+         2 4 6
+        8 5 9 3
+
+        That is, 3 + 7 + 4 + 9 = 23.
+
+        Find the maximum total from top to bottom of the triangle below:
+
+                                   75
+                                  95 64
+                                17 47 82
+                              18 35 87 10
+                            20 04 82 47 65
+                          19 01 23 75 03 34
+                        88 02 77 73 07 63 67
+                      99 65 04 28 06 16 70 92
+                    41 41 26 56 83 40 80 70 33
+                  41 48 72 33 47 32 37 16 94 29
+                53 71 44 65 25 43 91 52 97 51 14
+              70 11 33 28 77 73 17 78 39 68 17 57
+            91 71 52 38 17 14 91 43 58 50 27 29 48
+          63 66 04 68 89 53 67 30 73 16 69 87 40 31
+        04 62 98 27 23 09 70 98 73 93 38 53 60 04 23
+
+        Find the maximum total from top to bottom in triangle.txt (right click and 'Save Link/Target As...'), a 15K text file containing a triangle with one-hundred rows.
+
+        NOTE: This is a much more difficult version of Problem 18. It is not possible to try every route to solve this problem, as there are 299 altogether! 
+        If you could check one trillion (1012) routes every second it would take over twenty billion years to check them all. 
+        There is an efficient algorithm to solve it. ;o) 
+        """
+        nodes = []
+        with open('data/p067_triangle.txt') as f:
+            for line in f.readlines():
+                nodes += [Node(int(i)) for i in line.strip().split(' ')]
+
+        for level in range(triangle_root(len(nodes))-1):
+            for node in range(level+1):
+                parentIdx = (level * (level + 1) // 2) + node
+                leftChildIdx = parentIdx + (level + 1)
+                rightChildIdx = parentIdx + (level + 1) + 1
+                nodes[parentIdx].add_left_child(nodes[leftChildIdx])
+                nodes[parentIdx].add_right_child(nodes[rightChildIdx])
+                nodes[leftChildIdx].add_upper_right_parent(nodes[parentIdx])
+                nodes[rightChildIdx].add_upper_left_parent(nodes[parentIdx])
+        
+        # find the starting node of the last row
+        # index is found by subracting the triangle root from the number of nodes
+        left_idx = len(nodes) - triangle_root(len(nodes))
+
+        for node in nodes:
+            if node.upper_left is None and node.upper_right is None:
+                # this is the root node, set it's path value to itself
+                node.max_path_value = node.value
+            elif node.upper_left is None:
+                # this is on the left edge, the only option is to set the max value to this node plus the
+                # upper right parent's max path value
+                node.max_path_value = node.value + node.upper_right.max_path_value
+            elif node.upper_right is None:
+                # this is on the right edge, the only option is to set the max value to this node plus the
+                # upper left parent's
+                node.max_path_value = node.value + node.upper_left.max_path_value
+            else:
+                if node.upper_left.max_path_value > node.upper_right.max_path_value:
+                    node.max_path_value = node.value + node.upper_left.max_path_value
+                else:
+                    node.max_path_value = node.value + node.upper_right.max_path_value
+        return max([nodes[i].max_path_value for i in range(left_idx, len(nodes))])
+        #endregion
