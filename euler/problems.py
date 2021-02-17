@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import special
 from functools import reduce
+from node import Node
 
 # https://stackoverflow.com/a/60956561/5217293
 def register_problem(f):
@@ -124,6 +125,14 @@ def get_divisors(n):
     if int(np.sqrt(n)) ** 2 == n:
         divisors.append(int(np.sqrt(n)))
     return divisors
+
+def get_digit(x, n):
+    return x // 10 ** n % 10
+
+def triangle_root(x):
+    # triangle root: https://en.wikipedia.org/wiki/Triangular_number#Triangular_roots_and_tests_for_triangular_numbers
+    return int(np.sqrt(8 * x + 1) - 1) // 2
+
 #endregion
 
 class Problems:
@@ -696,8 +705,6 @@ class Problems:
 
         Ns = [list(i) for i in Ns]
 
-        get_digit = lambda x, n: x // 10 ** n % 10
-
         digits = {}
         for column in range(50):
             total = sum([int(N[column]) for N in Ns])
@@ -758,7 +765,6 @@ class Problems:
                     length += 1
         return max(lengths, key=lengths.get)
 
-    @current
     @register_problem
     def __15(self):
         """\thttps://projecteuler.net/problem=15
@@ -770,3 +776,190 @@ class Problems:
 
         # lattice path lengths are combinations https://en.wikipedia.org/wiki/Lattice_path
         return int(special.binom(40, 20))
+
+    @register_problem
+    def __16(self):
+        """\thttps://projecteuler.net/problem=16
+
+
+        2**15 = 32768 and the sum of its digits is 3 + 2 + 7 + 6 + 8 = 26.
+
+        What is the sum of the digits of the number 2**1000?
+        """
+
+        n = 2**1000
+
+        s = 0
+        while n > 0:
+            s += n % 10
+            n //= 10
+        
+        return s
+
+    @register_problem
+    def __17(self):
+        """\thttps://projecteuler.net/problem=17
+
+        If the numbers 1 to 5 are written out in words: one, two, three, four, five, then there are 3 + 3 + 5 + 4 + 4 = 19 letters used in total.
+
+        If all the numbers from 1 to 1000 (one thousand) inclusive were written out in words, how many letters would be used?
+
+        NOTE: Do not count spaces or hyphens. For example, 342 (three hundred and forty-two) contains 23 letters and 115 (one hundred and fifteen) contains 20 letters.
+        The use of "and" when writing out numbers is in compliance with British usage.
+        """
+
+        total = 0
+
+        ones = {0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine"}
+        tens = {10: "ten", 11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen", 15: "fifteen", 16: "sixteen", 17: "seventeen", 18: "eighteen", 19: "nineteen",
+                     20: "twenty", 30: "thirty", 40: "forty", 50: "fifty", 60: "sixty", 70: "seventy", 80: "eighty", 90: "ninety"}
+        
+        def name(x):
+            if x == 1000:
+                return "one thousand"
+            digits = [int(i) for i in str(x)]
+
+            n = ""
+            if len(digits) == 3:
+                digit = digits.pop(0)
+                if digits[0] == 0 and digits[1] == 0:
+                    return f"{ones[digit]} hundred"
+                else:
+                    n = f"{ones[digit]} hundred and "
+                x -= digit * 100
+                
+            if len(digits) == 2:
+                digit = digits.pop(0)
+                if digit == 0:
+                    pass
+                else:
+                    if x >= 11 and x <=19:
+                        n += f"{tens[x]} "
+                        return n.strip()
+                    else:
+                        n += f"{tens[digit * 10]} "
+                    
+                    if digits[0] == 0:
+                        digits.pop(0)
+
+            
+            if len(digits) == 1:
+                n += f"{ones[digits.pop(0)]}"
+
+            return n.strip()
+        
+        return sum([len(name(i).replace(' ', '')) for i in range(1, 1001)])
+
+    @current
+    @register_problem
+    def __18(self):
+        """\thttps://projecteuler.net/problem=18
+        By starting at the top of the triangle below and moving to adjacent numbers on the row below, the maximum total from top to bottom is 23.
+
+           3
+          7 4
+         2 4 6
+        8 5 9 3
+
+        That is, 3 + 7 + 4 + 9 = 23.
+
+        Find the maximum total from top to bottom of the triangle below:
+
+                                   75
+                                  95 64
+                                17 47 82
+                              18 35 87 10
+                            20 04 82 47 65
+                          19 01 23 75 03 34
+                        88 02 77 73 07 63 67
+                      99 65 04 28 06 16 70 92
+                    41 41 26 56 83 40 80 70 33
+                  41 48 72 33 47 32 37 16 94 29
+                53 71 44 65 25 43 91 52 97 51 14
+              70 11 33 28 77 73 17 78 39 68 17 57
+            91 71 52 38 17 14 91 43 58 50 27 29 48
+          63 66 04 68 89 53 67 30 73 16 69 87 40 31
+        04 62 98 27 23 09 70 98 73 93 38 53 60 04 23
+
+        NOTE: As there are only 16384 routes, it is possible to solve this problem by trying every route. 
+        However, Problem 67, is the same challenge with a triangle containing one-hundred rows; it cannot be solved by brute force, and requires a clever method! ;o)
+        """
+        nodes = [Node(i) for i in [3, 7, 4, 2, 4, 6, 8, 5, 9, 3]]
+        # nodes = [Node(i) for i in [75, 95, 64, 17, 47, 82, 18, 35, 87, 10, 20, 4, 82, 47, 65, 19, 1, 23, 75, 3, 34, 88, 2, 77, 73, 7, 63, 67, 99, 65, 4, 28, 6, 16, 70, 92, 41, 41, 26, 56, 83, 40, 80, 70, 33, 41, 48, 72, 33, 47, 32, 37, 16, 94, 29, 53, 71, 44, 65, 25, 43, 91, 52, 97, 51, 14, 70, 11, 33, 28, 77, 73, 17, 78, 39, 68, 17, 57, 91, 71, 52, 38, 17, 14, 91, 43, 58, 50, 27, 29, 48, 63, 66, 4, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31, 4, 62, 98, 27, 23, 9, 70, 98, 73, 93, 38, 53, 60, 4, 23]]
+
+        for level in range(triangle_root(len(nodes))-1):
+            for node in range(level+1):
+                parentIdx = (level * (level + 1) // 2) + node
+                leftChildIdx = parentIdx + (level + 1)
+                rightChildIdx = parentIdx + (level + 1) + 1
+                # print(f"parent {parentIdx} | left child: {parentIdx + (level + 1)} | right child: {parentIdx + (level + 1) + 1}")
+                nodes[parentIdx].add_left_child(nodes[leftChildIdx])
+                nodes[parentIdx].add_right_child(nodes[rightChildIdx])
+                nodes[leftChildIdx].add_upper_right_parent(nodes[parentIdx])
+                nodes[rightChildIdx].add_upper_left_parent(nodes[parentIdx])
+        
+        # find the starting node of the last row
+        # index is found by subracting the triangle root from the number of nodes
+        left_idx = len(nodes) - triangle_root(len(nodes))
+
+        path_values = []
+
+        # starting from the bottom row, traverse up the triangle, greedily choosing the most highly value parent as the next node
+        # for idx in range(left_idx, len(nodes)):
+        #     node = nodes[idx]
+        #     path_value = 0
+        #     while node is not None:
+        #         print(node.value)
+        #         path_value += node.value
+        #         # handle left and right tree edges
+        #         if node.upper_right is None:
+        #             node = node.upper_left
+        #         elif node.upper_left is None:
+        #             node = node.upper_right
+        #         elif node.upper_left.value > node.upper_right.value:
+        #             node = node.upper_left
+        #         else:
+        #             node = node.upper_right
+        #     print()
+        #     path_values.append(path_value)
+        
+        # print(max(path_values))
+
+        # starting from the top row, traverse down the triangle only choosing the maximum values
+        # node = nodes[0]
+        # length = 0
+        # while node is not None:
+        #     print(node.value)
+        #     length += node.value
+        #     if node.left is None and node.right is None:
+        #         node = None
+        #     else:
+        #         if node.left.value > node.right.value:
+        #             node = node.left
+        #         else:
+        #             node = node.right
+        # print(length)
+
+        # starting from the top row, set the maximum path to 0
+        # move to the next row, and set the maximum path at a node to the max value of
+        # the parent nodes plus the current nodes values
+
+        for node in nodes:
+            print(node.value)
+            if node.upper_left is None and node.upper_right is None:
+                # this is the rood node, set it's path value to itself
+                node.max_path_value = node.value
+            elif node.upper_left is None:
+                # this is on the left edge, the only option is to set the max value to this node plus the
+                # upper right parent's max path value
+                node.max_path_value = node.value + node.upper_right.max_path_value
+            elif node.upper_right is None:
+                # this is on the right edge, the only option is to set the max value to this node plus the
+                # upper left parent's
+                node.max_path_value = node.value + node.upper_left.max_path_value
+            else:
+                if node.upper_left.max_path_value > node.upper_right.max_path_value:
+                    node.max_path_value = node.value + node.upper_left.max_path_value
+                else:
+                    node.max_path_value = node.value + node.upper_right.max_path_value
+        return max([nodes[i].max_path_value for i in range(left_idx, len(nodes))])
