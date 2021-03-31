@@ -2,6 +2,7 @@ import numpy as np
 from scipy import special
 from functools import reduce
 from node import Node
+from datetime import date, timedelta
 
 # https://stackoverflow.com/a/60956561/5217293
 def register_problem(f):
@@ -58,7 +59,6 @@ def get_number_of_divisors(n):
     exp = get_prime_factor_exponents(n)
     return np.prod([i + 1 for i in exp.values()])
 
-
 def gcd(a, b):
     if (a < b):
         return gcd(b, a)
@@ -113,7 +113,6 @@ def gen_primes():
 
     q += 1
 
-
 def is_coprime(a, b):
     return gcd(a, b) == 1
 
@@ -128,6 +127,9 @@ def get_divisors(n):
 
 def get_digit(x, n):
     return x // 10 ** n % 10
+
+def get_last_n_digits(x, n):
+    return x % 10 ** n
 
 def triangle_root(x):
     # triangle root: https://en.wikipedia.org/wiki/Triangular_number#Triangular_roots_and_tests_for_triangular_numbers
@@ -921,7 +923,6 @@ class Problems:
         print([nodes[i].max_path_value for i in range(left_idx, len(nodes))])
         return max([nodes[i].max_path_value for i in range(left_idx, len(nodes))])
 
-    @current
     @register_problem
     def __19(self):
         """\thttps://projecteuler.net/problem=19
@@ -939,7 +940,71 @@ class Problems:
         How many Sundays fell on the first of the month during the twentieth century (1 Jan 1901 to 31 Dec 2000)?
         """
 
-        return 0
+        def _is_leap(x):
+            return x % 4 == 0 and (x % 100 != 0 or x % 400 == 0)
+        
+        def get_day_of_week(date):
+            """ Return a number from 0-6 to indicate what weekday a year was
+            https://en.wikipedia.org/wiki/Zeller%27s_congruence
+
+            0 - Saturday
+            1 - Sunday
+            2 - Monday
+            3 - Tuesday
+            4 - Wednesday
+            5 - Thursday
+            6 - Friday
+            """
+            q = date.day
+            m = date.month if date.month >= 3 else date.month + 12 # January = 13, Februrary = 14, all other months are their month codes
+            k = date.year % 100
+            j = date.year // 100
+
+            return (q + (13 * (m + 1) // 5) + k + k // 4 + j // 4 -2*j) % 7
+        
+        days = 0
+        for year in range(1901, 2001):
+            for month in range(1, 13):
+                d = date(year, month, 1)
+                days += get_day_of_week(d) == 1
+        
+        return days
+
+    @current
+    @register_problem
+    def __20(self):
+        """\thttps://projecteuler.net/problem=20
+        n! means n × (n − 1) × ... × 3 × 2 × 1
+
+        For example, 10! = 10 × 9 × ... × 3 × 2 × 1 = 3628800,
+        and the sum of the digits in the number 10! is 3 + 6 + 2 + 8 + 8 + 0 + 0 = 27.
+
+        Find the sum of the digits in the number 100!
+        """
+
+        def multiply(n, x):
+            """ multiply n by x
+            ---
+            n: an array representing the numbers with the largest digit first, e.g., the number 123 should be passed as [1, 2, 3]
+
+            x: the number to multiply n by
+            """
+            carry = 0
+            n = list(reversed(n))
+            for idx, i in enumerate(n):
+                a = x * i + carry
+                n[idx] = a % 10
+                carry = a // 10
+            if carry > 0:
+                while carry > 0:
+                    n.append(carry % 10)
+                    carry //= 10
+            return list(reversed(n))
+
+        n = [1]
+        for i in range(1, 101):
+            n = multiply(n, i)
+        return sum(n)
     #endregion
 
     #region 61-70
@@ -1016,4 +1081,4 @@ class Problems:
                 else:
                     node.max_path_value = node.value + node.upper_right.max_path_value
         return max([nodes[i].max_path_value for i in range(left_idx, len(nodes))])
-        #endregion
+    #endregion
