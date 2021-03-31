@@ -1,3 +1,4 @@
+from os import name
 import numpy as np
 from scipy import special
 from functools import reduce
@@ -1008,7 +1009,6 @@ class Problems:
     #endregion
 
     #region 21-30
-    @current
     @register_problem
     def __21(self):
         """\thttps://projecteuler.net/problem=21
@@ -1032,6 +1032,54 @@ class Problems:
                 amicable_sum += k + v
 
         return amicable_sum
+
+    @current
+    @register_problem
+    def __22(self):
+        """\thttps://projecteuler.net/problem=22
+        Using names.txt (right click and 'Save Link/Target As...'), a 46K text file containing over five-thousand first names, 
+        begin by sorting it into alphabetical order. Then working out the alphabetical value for each name, 
+        multiply this value by its alphabetical position in the list to obtain a name score.
+
+        For example, when the list is sorted into alphabetical order, COLIN, which is worth 3 + 15 + 12 + 9 + 14 = 53, 
+        is the 938th name in the list. So, COLIN would obtain a score of 938 × 53 = 49714.
+
+        What is the total of all the name scores in the file?
+        """
+
+        import csv
+        with open('data/p022_names.txt', 'r') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                names = row
+        
+        def quicksort(a, lo, hi):
+            if lo < hi:
+                p = partition(a, lo, hi)
+                quicksort(a, lo, p-1)
+                quicksort(a, p+1, hi)
+            return a
+        
+        def partition(a, lo, hi):
+            pivot = a[hi]
+            i = lo
+            for j in range(lo, hi):
+                if a[j] < pivot:
+                    a[i], a[j] = a[j], a[i]
+                    i += 1
+            a[i], a[hi] = a[hi], a[i]
+            return i
+
+        quicksort(names, 0, len(names)-1)
+
+        total = 0
+
+        for idx, name in enumerate(names):
+            worth = sum([ ord(c) - 64 for c in name])
+            score = (idx + 1) * worth
+            total += score
+
+        return total
 
     #endregion
 
