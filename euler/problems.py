@@ -123,6 +123,7 @@ def get_divisors(n):
     divisors = [j for i in divisors for j in i]
     if int(np.sqrt(n)) ** 2 == n:
         divisors.append(int(np.sqrt(n)))
+    
     return divisors
 
 def get_digit(x, n):
@@ -970,7 +971,6 @@ class Problems:
         
         return days
 
-    @current
     @register_problem
     def __20(self):
         """\thttps://projecteuler.net/problem=20
@@ -1005,6 +1005,34 @@ class Problems:
         for i in range(1, 101):
             n = multiply(n, i)
         return sum(n)
+    #endregion
+
+    #region 21-30
+    @current
+    @register_problem
+    def __21(self):
+        """\thttps://projecteuler.net/problem=21
+
+        Let d(n) be defined as the sum of proper divisors of n (numbers less than n which divide evenly into n).
+        If d(a) = b and d(b) = a, where a ≠ b, then a and b are an amicable pair and each of a and b are called amicable numbers.
+
+        For example, the proper divisors of 220 are 1, 2, 4, 5, 10, 11, 20, 22, 44, 55 and 110; therefore d(220) = 284. The proper divisors of 284 are 1, 2, 4, 71 and 142; so d(284) = 220.
+
+        Evaluate the sum of all the amicable numbers under 10000.
+        """
+
+        divisor_sums = {i : sum(get_divisors(i)) - i for i in range(1, 10000+1)}
+
+        amicable_sum = 0
+
+        for k, v in divisor_sums.items():
+            # only add k and v to the amicable sum if this is the first time we have found this pair
+            # the first time that we encounter this pair, v will be less than k
+            if v in divisor_sums and divisor_sums[v] == k and v > k:
+                amicable_sum += k + v
+
+        return amicable_sum
+
     #endregion
 
     #region 61-70
