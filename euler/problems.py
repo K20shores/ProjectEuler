@@ -1110,7 +1110,30 @@ class Problems:
             s = sum(get_divisors(n)) - n
             return s < n
 
-        return 0
+        ulimit = 28123
+        
+        abundants = [n for n in range(1, ulimit + 1) if is_abundant(n)]
+
+        # the first solution involved setting each number that can be written
+        # as an abundant sum to 0 and then taking the sum of those numbers
+        # ns = np.array([n for n in range(1, ulimit + 1)])
+        # the second solution simply kept track of only those numbers which could be written
+        # as an abundant sum and then subtracted their total from the sum of all number from 1 to ulimit
+
+        s = ulimit * (ulimit + 1) / 2
+
+        invalid = {}
+
+        for idx, lo in enumerate(abundants):
+            for hi in abundants[idx:]:
+                if lo + hi <= ulimit:
+                    invalid[lo + hi] = 1
+                    # ns[lo + hi - 1] = 0
+                else:
+                    break
+
+        return s - sum(invalid.keys())
+        # return ns.sum()
 
     #endregion
 
